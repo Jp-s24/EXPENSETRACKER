@@ -1,5 +1,9 @@
-function App() {
-  return <h1>Hello, Expense Tracker 🚀</h1>;
+import React from 'react'
+
+const App = () => {
+  return (
+    <div>App</div>
+  )
 }
 
-export default App;
+export default App

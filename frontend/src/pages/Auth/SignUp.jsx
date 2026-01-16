@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ProfilePhotoSelector from "../../components/Inputs/ProfilePhotoSelector.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "../../components/layouts/AuthLayout.jsx";
 import Input from "../../components/Inputs/Input.jsx";
@@ -47,6 +48,8 @@ const SignUp = () => {
         </p>
 
         <form onSubmit={handleSignUp} className="space-y-4">
+
+          <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
           <Input
             value={fullName}
             onChange={({ target }) => setFullName(target.value)}
@@ -63,6 +66,8 @@ const SignUp = () => {
             type="text"
           />
 
+          <div className="col-span-2">
+
           <Input
             value={password}
             onChange={({ target }) => setPassword(target.value)}
@@ -70,6 +75,8 @@ const SignUp = () => {
             placeholder="Min 8 characters"
             type="password"
           />
+
+          </div>
 
           {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
 

@@ -18,8 +18,10 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    if (!fullName.trim()) {
-      setError("Please enter your full name.");
+    let profileImageUrl = ""; 
+
+    if (!fullName ) {
+      setError("Please enter your name.");
       return;
     }
 
@@ -28,12 +30,19 @@ const SignUp = () => {
       return;
     }
 
-    if (!password || password.length < 8) {
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
+
+    if (password.length < 8) {
       setError("Password must be at least 8 characters.");
       return;
     }
 
-    setError(null);
+    setError("");
+
+    //SignUp API Call
 
     // TEMP TEST
     console.log({ fullName, email, password });
@@ -50,6 +59,10 @@ const SignUp = () => {
         <form onSubmit={handleSignUp} className="space-y-4">
 
           <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          </div>
+
           <Input
             value={fullName}
             onChange={({ target }) => setFullName(target.value)}

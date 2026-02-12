@@ -5,12 +5,15 @@ import Input from "../../components/Inputs/Input.jsx";
 import { validateEmail } from "../../utils/helper.js";
 import axiosInstance from "../../utils/axiosInstance.js";
 import { API_PATHS } from "../../utils/apiPaths.js";
-
+import { useContext } from "react";
+import { UserContext } from "../../context/userContext.jsx";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+
+  const { updateUser } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -23,7 +26,7 @@ const Login = () => {
       return;
     }
 
-    if(!password) {
+    if (!password) {
       setError("Please enter your password.");
       return;
     }
@@ -31,18 +34,18 @@ const Login = () => {
     setError("");
 
     //Login API Call
-    try{
+    try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         email,
         password,
-      }); 
+      });
       const { token, user } = response.data;
 
       // Save token and user info in localStorage
       localStorage.setItem("token", token);
+      updateUser(user);
       localStorage.setItem("user", JSON.stringify(user));
       navigate("/dashboard");
-
     } catch (error) {
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
@@ -50,11 +53,6 @@ const Login = () => {
         setError("Something went wrong. Please try again.");
       }
     }
-  
-
-
-
-
 
     // Temporary test
     console.log({ email, password });

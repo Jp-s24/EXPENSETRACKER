@@ -10,10 +10,12 @@ import Login from './pages/Auth/Login.jsx';
 import SignUp from './pages/Auth/SignUp.jsx';
 import Home from './pages/Auth/Dashboard/Home.jsx';
 import Income from './pages/Auth/Dashboard/Income.jsx';
-import Expense from './pages/Auth/Dashboard/Expense.jsx'; // ✅ Make sure this file exists!
+import Expense from './pages/Auth/Dashboard/Expense.jsx'; 
+import UserProvider from "./context/userContext.jsx";
 
 const App = () => {
   return (
+    <UserProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Root />} />
@@ -24,6 +26,7 @@ const App = () => {
         <Route path="/expense" element={<Expense />} />
       </Routes>
     </Router>
+    </UserProvider>
   );
 };
 

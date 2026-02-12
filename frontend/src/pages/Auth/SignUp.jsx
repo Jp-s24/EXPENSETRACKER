@@ -4,6 +4,11 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthLayout from "../../components/layouts/AuthLayout.jsx";
 import Input from "../../components/Inputs/Input.jsx";
 import { validateEmail } from "../../utils/helper.js";
+import axiosInstance from "../../utils/axiosInstance.js";
+import { API_PATHS } from "../../utils/apiPaths.js";
+import { useContext } from "react";
+import { UserContext } from "../../context/userContext.jsx";
+import uploadImage from "../../utils/uploadImage.js";
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -12,15 +17,16 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+  const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   // Handle Sign Up Form Submit
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    let profileImageUrl = ""; 
+    let profileImageUrl = "";
 
-    if (!fullName ) {
+    if (!fullName) {
       setError("Please enter your name.");
       return;
     }
@@ -43,9 +49,42 @@ const SignUp = () => {
     setError("");
 
     //SignUp API Call
+    try {
+      //Upload image if present
+      if (profilePic) {
+        const imgUploadRes = await uploadImage(profilePic);
+        console.log("UPLOAD RESPONSE:", imgUploadRes);
+
+        profileImageUrl = imgUploadRes.imageUrl;
+      }
+
+      // console.log("Profile Pic:", profilePic);
+      // console.log("Profile URL BEFORE sending:", profileImageUrl);
+
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        fullName,
+        email,
+        password,
+        profileImageUrl,
+      });
+
+      const { token, user } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(user);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    }
 
     // TEMP TEST
-    console.log({ fullName, email, password });
+    console.log({ fullName, email, password, profileImageUrl });
   };
 
   return (
@@ -57,11 +96,9 @@ const SignUp = () => {
         </p>
 
         <form onSubmit={handleSignUp} className="space-y-4">
-
           <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
           <Input
             value={fullName}
@@ -80,15 +117,13 @@ const SignUp = () => {
           />
 
           <div className="col-span-2">
-
-          <Input
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
-            label="Password"
-            placeholder="Min 8 characters"
-            type="password"
-          />
-
+            <Input
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
+              label="Password"
+              placeholder="Min 8 characters"
+              type="password"
+            />
           </div>
 
           {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}

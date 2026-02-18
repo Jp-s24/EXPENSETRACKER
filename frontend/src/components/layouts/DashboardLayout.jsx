@@ -1,8 +1,9 @@
-import React from 'react'
-import { UserContext } from '../../context/UserContext';
-import Navbar from './Navbar';
-import SideMenu from './SideMenu';
-import { useContext } from 'react';
+import React from "react";
+import { UserContext } from "../../context/UserContext";
+import Navbar from "./Navbar";
+import SideMenu from "./SideMenu";
+import { useContext } from "react";
+
 
 const DashboardLayout = ({ children, activeMenu }) => {
   const { user } = useContext(UserContext);
@@ -17,9 +18,12 @@ const DashboardLayout = ({ children, activeMenu }) => {
           </div>
           <div className="grow mx-5">{children}</div>
         </div>
+        
       )}
     </div>
+    
   );
+  
 };
 
-export default DashboardLayout
+export default DashboardLayout;

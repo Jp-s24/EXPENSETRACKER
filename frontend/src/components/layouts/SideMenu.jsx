@@ -7,6 +7,10 @@ const SideMenu = ({ activeMenu }) => {
   const { user, clearUser } = useContext(UserContext);
   const navigate = useNavigate();
 
+  // ✅ DEBUG LOGS (correct placement)
+  console.log("User:", user);
+  console.log("Image URL:", user?.profileImageUrl);
+
   const handleClick = (route) => {
     if (route === "logout") {
       handleLogout();

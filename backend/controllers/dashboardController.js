@@ -20,7 +20,6 @@ exports.getDashboardData = async (req, res) => {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-
     // 🔹 Last 60 Days Income
     const last60DaysIncomeTransactions = await Income.find({
       userId,
@@ -32,52 +31,63 @@ exports.getDashboardData = async (req, res) => {
       0,
     );
 
-    // 🔹 Last 30 Days Expenses
+    // 🔹 Last 30 Days Expenses (for charts / summary)
     const last30DaysExpenseTransactions = await Expense.find({
       userId,
       date: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
     }).sort({ date: -1 });
-
-    //get total expenses for last 30 days   
 
     const expenseLast30Days = last30DaysExpenseTransactions.reduce(
       (sum, transaction) => sum + transaction.amount,
       0,
     );
 
+    // 🔹 ALL Expenses (for Expense Section)
+    const allExpenseTransactions = await Expense.find({
+      userId,
+    }).sort({ date: -1 });
 
-
-    // Fetch last 5 transactions (both income and expense) and sort by date
+    // 🔹 Last 5 Transactions Combined (Income + Expense)
     const lastTransactions = [
-     ...(await Income.find({ userId }).sort({ date: -1 }).limit(5)).map ((transaction) => ({
-        ...transaction.toObject(),
-        type: "income",
-      })
-    ),
-
-    ...(await Expense.find({ userId }).sort({ date: -1 }).limit(5)).map ((transaction) => ({
-        ...transaction.toObject(),
-        type: "expense",
-      })
-    ),
-
-    ]
-      .sort((a, b) => b.date - a.date) //sort latest first 
+      ...(await Income.find({ userId }).sort({ date: -1 }).limit(5)).map(
+        (transaction) => ({
+          ...transaction.toObject(),
+          type: "income",
+        }),
+      ),
+      ...(await Expense.find({ userId }).sort({ date: -1 }).limit(5)).map(
+        (transaction) => ({
+          ...transaction.toObject(),
+          type: "expense",
+        }),
+      ),
+    ].sort((a, b) => b.date - a.date);
 
     // 🔹 Final Response
     res.json({
       totalBalance:
-      (totalIncome[0]?.total || 0) - (totalExpense[0]?.total || 0),
+        (totalIncome[0]?.total || 0) - (totalExpense[0]?.total || 0),
       totalIncome: totalIncome[0]?.total || 0,
       totalExpense: totalExpense[0]?.total || 0,
+
+      // Chart / summary: last 30 days
       last30DaysExpenses: {
         total: expenseLast30Days,
         transactions: last30DaysExpenseTransactions,
       },
+
+      // Income chart: last 60 days
       last60DaysIncome: {
         total: incomeLast60Days,
         transactions: last60DaysIncomeTransactions,
       },
+
+      // All expenses (for full Expense section list)
+      allExpenses: {
+        total: totalExpense[0]?.total || 0,
+        transactions: allExpenseTransactions,
+      },
+
       recentTransactions: lastTransactions,
     });
   } catch (error) {

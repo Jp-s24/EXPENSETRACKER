@@ -94,7 +94,7 @@ const Home = () => {
           />
 
           <ExpenseTransactions
-            transactions={dashboardData?.last30DaysExpenses?.transactions || []}
+            transactions={dashboardData?.allExpenses?.transactions || []}
             onSeeMore={() => navigate("/expense")}
           />
 
